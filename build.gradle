@@ -1,0 +1,4 @@
+group 'acmil.l2.clientmod'
+version '1.0'
+
+apply plugin: 'java'
