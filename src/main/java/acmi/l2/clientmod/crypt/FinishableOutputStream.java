@@ -25,7 +25,7 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public abstract class FinishableOutputStream extends FilterOutputStream {
+public class FinishableOutputStream extends FilterOutputStream {
     /**
      * Creates an output stream filter built on top of the specified
      * underlying output stream.
