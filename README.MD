@@ -20,6 +20,34 @@ try(InputStream is = L2Crypt.getInputStream(cryptedFile);
 }
 ```
 
+Maven
+-----
+```maven
+<repository>
+    <id>l2crypt-github</id>
+    <url>https://raw.githubusercontent.com/acmi/L2crypt/mvn-repo</url>
+</repository>
+
+<dependency>
+    <groupId>acmi.l2.clientmod</groupId>
+    <artifactId>l2crypt</artifactId>
+    <version>1.2</version>
+</dependency>
+```
+
+Gradle
+------
+```gradle
+repositories {
+    // ...
+    maven { url "https://raw.githubusercontent.com/acmi/L2crypt/mvn-repo" }
+}
+
+dependencies {
+    compile group:'acmi.l2.clientmod', name:'l2crypt', version: '1.2'
+}
+```
+
 Credits
 -------
 * The Legion of the Bouncy Castle for Blowfish Engine that is part of the [BouncyCastle JCE]
