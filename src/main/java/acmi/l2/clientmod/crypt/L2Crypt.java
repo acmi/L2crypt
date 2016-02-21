@@ -63,22 +63,25 @@ public class L2Crypt {
 
     public static final int HEADER_SIZE = 28;
 
-    public static int readHeader(InputStream input) throws IOException {
+    public static int readHeader(InputStream input) throws IOException, CryptoException {
         byte[] header = new byte[HEADER_SIZE];
         new DataInputStream(input).readFully(header);
         String headerStr = new String(header, Charset.forName("utf-16le"));
         if (!headerStr.matches("Lineage2Ver\\d{3}"))
-            throw new IOException("Not a Lineage 2 encrypted file");
+            throw new CryptoException("Not a Lineage 2 encrypted file");
 
         return Integer.valueOf(headerStr.substring(11));
     }
 
-    public static void writeHeader(OutputStream output, int version) throws IOException{
-        output.write(("Lineage2Ver"+version).getBytes(Charset.forName("UTF-16LE")));
+    public static void writeHeader(OutputStream output, int version) throws IOException {
+        output.write(("Lineage2Ver" + version).getBytes(Charset.forName("UTF-16LE")));
     }
 
-    public static InputStream getInputStream(File file) throws IOException {
-        InputStream input = new FileInputStream(file);
+    public static InputStream getInputStream(File file) throws IOException, CryptoException {
+        return decrypt(new FileInputStream(file), file.getName());
+    }
+
+    public static InputStream decrypt(InputStream input, String fileName) throws IOException, CryptoException {
         int version = readHeader(input);
         switch (version) {
             //XOR
@@ -90,7 +93,7 @@ public class L2Crypt {
             case 121:
                 return new L2Ver1x1InputStream(input, version == 111 ?
                         XOR_KEY_111 :
-                        getXORKey121(file.getName()));
+                        getXORKey121(fileName));
             case 820:
                 input = LameCrypt.wrapInput(input);
             case 120:
@@ -120,12 +123,15 @@ public class L2Crypt {
                 BigInteger exponent = RSA_KEYS[version - 411][1];
                 return new L2Ver41xInputStream(input, modulus, exponent);
             default:
-                throw new RuntimeException("Unsupported crypt version: " + version);
+                throw new CryptoException("Unsupported crypt version: " + version);
         }
     }
 
-    public static OutputStream getOutputStream(File file, int version) throws IOException{
-        OutputStream output = new FileOutputStream(file);
+    public static OutputStream getOutputStream(File file, int version) throws IOException, CryptoException {
+        return encrypt(new FileOutputStream(file), file.getName(), version);
+    }
+
+    public static OutputStream encrypt(OutputStream output, String fileName, int version) throws IOException, CryptoException {
         writeHeader(output, version);
         switch (version) {
             //XOR
@@ -137,7 +143,7 @@ public class L2Crypt {
             case 121:
                 return new L2Ver1x1OutputStream(output, version == 111 ?
                         XOR_KEY_111 :
-                        getXORKey121(file.getName()));
+                        getXORKey121(fileName));
             case 820:
                 output = LameCrypt.wrapOutput(output);
             case 120:
@@ -164,7 +170,7 @@ public class L2Crypt {
             case 414:
                 return new L2Ver41xOutputStream(output, publicModulus, publicExponent);
             default:
-                throw new RuntimeException("Unsupported version: " + version);
+                throw new CryptoException("Unsupported version: " + version);
         }
     }
 }

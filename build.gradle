@@ -1,4 +1,4 @@
-group 'acmil.l2.clientmod'
-version '1.1'
+group 'acmi.l2.clientmod'
+version '1.2'
 
 apply plugin: 'java'

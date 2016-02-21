@@ -21,11 +21,13 @@
  */
 package acmi.l2.clientmod.crypt.blowfish;
 
+import acmi.l2.clientmod.crypt.CryptoException;
 import acmi.l2.clientmod.crypt.FinishableOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -70,7 +72,11 @@ public final class L2Ver21xOutputStream extends FinishableOutputStream implement
             return;
 
         Arrays.fill(dataBuffer.array(), dataBuffer.position(), dataBuffer.limit(), (byte) 0);
-        blowfish.processBlock(dataBuffer.array(), dataBuffer.arrayOffset(), writeBuffer, 0);
+        try {
+            blowfish.processBlock(dataBuffer.array(), dataBuffer.arrayOffset(), writeBuffer, 0);
+        } catch (GeneralSecurityException e) {
+            throw new CryptoException(e);
+        }
         out.write(writeBuffer);
     }
 }

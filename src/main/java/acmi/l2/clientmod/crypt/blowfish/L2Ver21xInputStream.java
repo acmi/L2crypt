@@ -21,10 +21,13 @@
  */
 package acmi.l2.clientmod.crypt.blowfish;
 
+import acmi.l2.clientmod.crypt.CryptoException;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
 import java.util.Objects;
 
 public final class L2Ver21xInputStream extends InputStream implements L2Ver21x {
@@ -48,7 +51,11 @@ public final class L2Ver21xInputStream extends InputStream implements L2Ver21x {
         if (dataBuffer.position() == dataBuffer.limit()) {
             in.readFully(readBuffer);
             dataBuffer.clear();
-            blowfish.processBlock(readBuffer, 0, dataBuffer.array(), dataBuffer.arrayOffset());
+            try {
+                blowfish.processBlock(readBuffer, 0, dataBuffer.array(), dataBuffer.arrayOffset());
+            } catch (GeneralSecurityException e) {
+                throw new CryptoException(e);
+            }
         }
         return dataBuffer.get() & 0xff;
     }

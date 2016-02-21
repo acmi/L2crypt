@@ -51,7 +51,7 @@ public class LameCrypt {
         };
     }
 
-    public static OutputStream wrapOutput(OutputStream output){
+    public static OutputStream wrapOutput(OutputStream output) {
         return new OutputStream() {
             private int pos = L2Crypt.HEADER_SIZE % cryptString.length();
 

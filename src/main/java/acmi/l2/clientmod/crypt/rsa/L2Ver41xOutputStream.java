@@ -21,6 +21,7 @@
  */
 package acmi.l2.clientmod.crypt.rsa;
 
+import acmi.l2.clientmod.crypt.CryptoException;
 import acmi.l2.clientmod.crypt.FinishableOutputStream;
 
 import javax.crypto.Cipher;
@@ -87,7 +88,7 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
                 cipher = Cipher.getInstance("RSA/ECB/NoPadding");
                 cipher.init(Cipher.ENCRYPT_MODE, keyFactory.generatePublic(keySpec));
             } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
+                throw new CryptoException(e);
             }
         }
 
@@ -127,7 +128,7 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
             try {
                 cipher.doFinal(block, 0, 128, block);
             } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
+                throw new CryptoException(e);
             }
 
             out.write(block);

@@ -21,6 +21,8 @@
  */
 package acmi.l2.clientmod.crypt.rsa;
 
+import acmi.l2.clientmod.crypt.CryptoException;
+
 import javax.crypto.Cipher;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -99,7 +101,7 @@ public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
                 cipher = Cipher.getInstance("RSA/ECB/NoPadding");
                 cipher.init(Cipher.DECRYPT_MODE, keyFactory.generatePrivate(keySpec));
             } catch (GeneralSecurityException e) {
-                throw new RuntimeException(e);
+                throw new CryptoException(e);
             }
         }
 
@@ -119,13 +121,13 @@ public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
 
                 try {
                     cipher.doFinal(readBuffer, 0, 128, readBuffer);
-                } catch (GeneralSecurityException | IndexOutOfBoundsException e) {
-                    throw new RuntimeException(e);
+                } catch (GeneralSecurityException e) {
+                    throw new CryptoException(e);
                 }
 
                 int size = readBuffer[3] & 0xff;
                 if (size > 124)
-                    throw new IOException("block data size too large");
+                    throw new IllegalStateException("block data size too large");
 
                 dataBuffer.clear();
                 dataBuffer.put(readBuffer, 128 - size - ((124 - size) % 4), size);

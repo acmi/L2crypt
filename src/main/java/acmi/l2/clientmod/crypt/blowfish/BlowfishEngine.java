@@ -21,7 +21,8 @@
  */
 package acmi.l2.clientmod.crypt.blowfish;
 
-import java.io.IOException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.ShortBufferException;
 
 /**
  * A class that provides Blowfish key encryption operations,
@@ -343,17 +344,17 @@ public final class BlowfishEngine {
         setKey(workingKey);
     }
 
-    public final int processBlock(byte[] in, int inOff, byte[] out, int outOff) throws IOException {
+    public final int processBlock(byte[] in, int inOff, byte[] out, int outOff) throws IllegalBlockSizeException, ShortBufferException {
         if (workingKey == null) {
             throw new IllegalStateException("Blowfish not initialised");
         }
 
         if (inOff + BLOCK_SIZE > in.length) {
-            throw new IOException("input buffer too short");
+            throw new IllegalBlockSizeException("input buffer too short");
         }
 
         if (outOff + BLOCK_SIZE > out.length) {
-            throw new IOException("output buffer too short");
+            throw new ShortBufferException("output buffer too short");
         }
 
         if (encrypting) {
