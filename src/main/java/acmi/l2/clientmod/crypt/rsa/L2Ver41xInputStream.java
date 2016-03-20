@@ -42,13 +42,12 @@ public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
     private int size;
     private int got;
 
+    @SuppressWarnings("resource")
     public L2Ver41xInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws IOException {
-        RSAInputStream rsaInputStream = new RSAInputStream(Objects.requireNonNull(input, "stream"), Objects.requireNonNull(modulus, "modulus"), Objects.requireNonNull(exponent, "exponent"));
-
-        DataInputStream dataInputStream = new DataInputStream(rsaInputStream);
-        size = Integer.reverseBytes(dataInputStream.readInt());
-
-        stream = new InflaterInputStream(rsaInputStream);
+    	RSAInputStream rsaInputStream = new RSAInputStream(Objects.requireNonNull(input, "stream"), Objects.requireNonNull(modulus, "modulus"), Objects.requireNonNull(exponent, "exponent"));
+    	DataInputStream dataInputStream = new DataInputStream(rsaInputStream);
+    	size = Integer.reverseBytes(dataInputStream.readInt());
+    	stream = new InflaterInputStream(rsaInputStream);
     }
 
     @Override
@@ -76,6 +75,35 @@ public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
             return;
 
         closed = true;
+    }
+    
+    @Override
+    public boolean markSupported() {
+        return stream.markSupported();
+    }
+	
+    @Override
+    public synchronized void mark(int readlimit) {
+        if (closed)
+	        return;
+
+        stream.mark(readlimit);
+    }
+	
+    @Override
+    public synchronized void reset() throws IOException {
+        if (closed) 
+            throw new IOException("Stream closed");
+
+        stream.reset();
+    }
+	
+    @Override
+    public long skip(long n) throws IOException {
+        if (closed)
+            throw new IOException("Stream closed");
+
+        return stream.skip(n);
     }
 
     private static class RSAInputStream extends InputStream {
@@ -144,6 +172,35 @@ public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
 
             closed = true;
             input.close();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return input.markSupported();
+        }
+    	
+        @Override
+        public synchronized void mark(int readlimit) {
+            if (closed)
+    	        return;
+
+            input.mark(readlimit);
+        }
+    	
+        @Override
+        public synchronized void reset() throws IOException {
+            if (closed) 
+                throw new IOException("Stream closed");
+
+            input.reset();
+        }
+    	
+        @Override
+        public long skip(long n) throws IOException {
+            if (closed)
+                throw new IOException("Stream closed");
+
+            return input.skip(n);
         }
     }
 }
