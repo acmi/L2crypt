@@ -22,8 +22,14 @@
 package acmi.l2.clientmod.crypt;
 
 public class CryptoException extends RuntimeException {
+    private static final long serialVersionUID = 5681912608875793862L;
+
     public CryptoException(String message) {
         super(message);
+    }
+
+    public CryptoException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     public CryptoException(Throwable cause) {
