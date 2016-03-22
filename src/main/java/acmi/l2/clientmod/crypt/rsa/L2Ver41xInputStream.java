@@ -25,75 +25,47 @@ import acmi.l2.clientmod.crypt.CryptoException;
 
 import javax.crypto.Cipher;
 import java.io.DataInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.security.KeyFactory;
 import java.security.spec.RSAPrivateKeySpec;
 import java.util.Objects;
 import java.util.zip.InflaterInputStream;
 
-public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
-    private InputStream stream;
-    private boolean closed;
-
+public final class L2Ver41xInputStream extends FilterInputStream implements L2Ver41x {
     private int size;
-    private int got;
 
-    public L2Ver41xInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws IOException {
-        RSAInputStream rsaInputStream = new RSAInputStream(Objects.requireNonNull(input, "stream"), Objects.requireNonNull(modulus, "modulus"), Objects.requireNonNull(exponent, "exponent"));
-
-        DataInputStream dataInputStream = new DataInputStream(rsaInputStream);
-        size = Integer.reverseBytes(dataInputStream.readInt());
-
-        stream = new InflaterInputStream(rsaInputStream);
+    @SuppressWarnings("ConstantConditions")
+    public L2Ver41xInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws IOException, CryptoException {
+        super(null);
+        RSAInputStream rsaInputStream = new RSAInputStream(Objects.requireNonNull(input, "stream"),
+                Objects.requireNonNull(modulus, "modulus"),
+                Objects.requireNonNull(exponent, "exponent"));
+        size = Integer.reverseBytes(new DataInputStream(rsaInputStream).readInt());
+        in = new InflaterInputStream(rsaInputStream);
     }
 
-    @Override
-    public int read() throws IOException {
-        if (closed)
-            throw new IOException("Stream closed");
-
-        int b = stream.read();
-        if (got < size) got++;
-
-        return b;
+    public int getSize() {
+        return size;
     }
 
-    @Override
-    public int available() throws IOException {
-        if (closed)
-            throw new IOException("Stream closed");
-
-        return size - got;
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (closed)
-            return;
-
-        closed = true;
-    }
-
-    private static class RSAInputStream extends InputStream {
-        private InputStream input;
+    public static class RSAInputStream extends InputStream {
+        private DataInputStream input;
 
         private Cipher cipher;
 
-        private byte[] readBuffer = new byte[128];
-        private ByteBuffer dataBuffer = ByteBuffer.allocate(124);
-
-        {
-            dataBuffer.position(dataBuffer.limit());
-        }
+        private byte[] buffer = new byte[128];
+        private int startPosition;
+        private int position;
+        private int size;
 
         private boolean closed;
 
-        public RSAInputStream(InputStream input, BigInteger modulus, BigInteger exponent) {
-            this.input = input;
+        public RSAInputStream(InputStream input, BigInteger modulus, BigInteger exponent) throws CryptoException {
+            this.input = new DataInputStream(input);
 
             try {
                 KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -105,45 +77,77 @@ public final class L2Ver41xInputStream extends InputStream implements L2Ver41x {
             }
         }
 
-        @Override
-        public int read() throws IOException {
+        private void ensureOpen() throws IOException {
             if (closed)
                 throw new IOException("Stream closed");
+        }
 
-            if (dataBuffer.position() == dataBuffer.limit()) {
-                int remain = readBuffer.length;
-                while (remain > 0) {
-                    int r = input.read(readBuffer, readBuffer.length - remain, remain);
-                    if (r < 0)
-                        return r;
-                    remain -= r;
+        private boolean ensureFilled() throws IOException {
+            if (position == size) {
+                int remaining = buffer.length;
+                while (remaining > 0) {
+                    int count = input.read(buffer, buffer.length - remaining, remaining);
+                    if (count < 0)
+                        return false;
+                    remaining -= count;
                 }
 
                 try {
-                    cipher.doFinal(readBuffer, 0, 128, readBuffer);
+                    cipher.doFinal(buffer, 0, 128, buffer);
                 } catch (GeneralSecurityException e) {
                     throw new CryptoException(e);
                 }
 
-                int size = readBuffer[3] & 0xff;
+                size = buffer[3] & 0xff;
                 if (size > 124)
                     throw new IllegalStateException("block data size too large");
 
-                dataBuffer.clear();
-                dataBuffer.put(readBuffer, 128 - size - ((124 - size) % 4), size);
-                dataBuffer.flip();
+                startPosition = 128 - size - ((124 - size) % 4);
+                position = 0;
+            }
+            return true;
+        }
+
+        @Override
+        public int read() throws IOException {
+            ensureOpen();
+            if (!ensureFilled())
+                return -1;
+
+            return buffer[startPosition + position++];
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            if (b == null) {
+                throw new NullPointerException();
+            } else if (off < 0 || len < 0 || len > b.length - off) {
+                throw new IndexOutOfBoundsException();
             }
 
-            return dataBuffer.get() & 0xff;
+            ensureOpen();
+            if (!ensureFilled())
+                return -1;
+
+            int read = Math.min(len, available());
+            System.arraycopy(buffer, startPosition + position, b, off, read);
+            position += read;
+            return read;
+        }
+
+        @Override
+        public int available() throws IOException {
+            ensureOpen();
+
+            return size - position;
         }
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
-
-            closed = true;
-            input.close();
+            if (!closed) {
+                closed = true;
+                input.close();
+            }
         }
     }
 }
