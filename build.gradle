@@ -1,4 +1,36 @@
 group 'acmi.l2.clientmod'
-version '1.2-SNAPSHOT'
+version '1.3.0'
 
 apply plugin: 'java'
+apply plugin: 'maven'
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+configure(install.repositories.mavenInstaller) {
+    pom.project {
+        name = 'L2crypt'
+        description = 'An open source library in Java for encryption/decryption Lineage 2 files.'
+        url = 'https://github.com/acmi/L2crypt'
+        licenses {
+            license {
+                name = 'The MIT License'
+                url = 'https://opensource.org/licenses/MIT'
+                distribution = 'repo'
+            }
+        }
+        developers {
+            developer {
+                id = 'acmi'
+                name = 'Aleksei Sazonov'
+                email = 'acmi831@gmail.com'
+            }
+        }
+    }
+}

@@ -31,7 +31,7 @@ Maven
 <dependency>
     <groupId>acmi.l2.clientmod</groupId>
     <artifactId>l2crypt</artifactId>
-    <version>1.2</version>
+    <version>1.3.+</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ repositories {
 }
 
 dependencies {
-    compile group:'acmi.l2.clientmod', name:'l2crypt', version: '1.2'
+    compile group:'acmi.l2.clientmod', name:'l2crypt', version: '1.3.+'
 }
 ```
 

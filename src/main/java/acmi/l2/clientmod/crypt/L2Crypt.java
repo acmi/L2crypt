@@ -42,6 +42,8 @@ import static acmi.l2.clientmod.crypt.xor.L2Ver1x1.XOR_KEY_111;
 import static acmi.l2.clientmod.crypt.xor.L2Ver1x1.getXORKey121;
 
 public class L2Crypt {
+    public static final int NO_CRYPT = -1;
+
     private static final BigInteger RSA_KEYS[][] = new BigInteger[][]{
             {MODULUS_411, PRIVATE_EXPONENT_411},
             {MODULUS_412, PRIVATE_EXPONENT_412},
@@ -63,12 +65,12 @@ public class L2Crypt {
 
     public static final int HEADER_SIZE = 28;
 
-    public static int readHeader(InputStream input) throws IOException, CryptoException {
+    public static int readHeader(InputStream input) throws IOException {
         byte[] header = new byte[HEADER_SIZE];
         new DataInputStream(input).readFully(header);
         String headerStr = new String(header, Charset.forName("utf-16le"));
         if (!headerStr.matches("Lineage2Ver\\d{3}"))
-            throw new CryptoException("Not a Lineage 2 encrypted file");
+            return NO_CRYPT;
 
         return Integer.valueOf(headerStr.substring(11));
     }
@@ -84,6 +86,8 @@ public class L2Crypt {
     public static InputStream decrypt(InputStream input, String fileName) throws IOException, CryptoException {
         int version = readHeader(input);
         switch (version) {
+            case NO_CRYPT:
+                return input;
             //XOR
             case 811:
             case 821:
@@ -132,6 +136,9 @@ public class L2Crypt {
     }
 
     public static OutputStream encrypt(OutputStream output, String fileName, int version) throws IOException, CryptoException {
+        if (version == NO_CRYPT)
+            return output;
+
         writeHeader(output, version);
         switch (version) {
             //XOR
