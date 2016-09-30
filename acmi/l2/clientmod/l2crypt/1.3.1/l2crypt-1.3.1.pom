@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>acmi.l2.clientmod</groupId>
+  <artifactId>l2crypt</artifactId>
+  <version>1.3.1</version>
+  <name>L2crypt</name>
+  <description>An open source library in Java for encryption/decryption Lineage 2 files.</description>
+  <url>https://github.com/acmi/L2crypt</url>
+  <licenses>
+    <license>
+      <name>The MIT License</name>
+      <url>https://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>acmi</id>
+      <name>Aleksei Sazonov</name>
+      <email>acmi831@gmail.com</email>
+    </developer>
+  </developers>
+</project>
