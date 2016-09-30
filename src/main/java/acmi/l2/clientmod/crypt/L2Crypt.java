@@ -55,7 +55,7 @@ public class L2Crypt {
 
     public static void set41xPrivateKey(int version, BigInteger modulus, BigInteger exponent) {
         RSA_KEYS[version - 411][0] = modulus;
-        RSA_KEYS[version - 411][0] = exponent;
+        RSA_KEYS[version - 411][1] = exponent;
     }
 
     public static void set41xPublicKey(BigInteger publicModulus, BigInteger publicExponent) {
