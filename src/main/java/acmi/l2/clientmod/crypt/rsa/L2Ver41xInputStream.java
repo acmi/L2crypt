@@ -114,7 +114,7 @@ public final class L2Ver41xInputStream extends FilterInputStream implements L2Ve
             if (!ensureFilled())
                 return -1;
 
-            return buffer[startPosition + position++];
+            return buffer[startPosition + position++] & 0xFF;
         }
 
         @Override
