@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ public class FinishableOutputStream extends FilterOutputStream {
      * underlying output stream.
      *
      * @param out the underlying output stream to be assigned to
-     *            the field <tt>this.out</tt> for later use, or
+     *            the field <code>this.out</code> for later use, or
      *            <code>null</code> if this instance is to be
      *            created without an underlying stream.
      */

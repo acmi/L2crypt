@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ import java.util.Objects;
 import java.util.zip.DeflaterOutputStream;
 
 public final class L2Ver41xOutputStream extends FinishableOutputStream implements L2Ver41x {
-    private ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream(0);
+    private final ByteArrayOutputStream dataBuffer = new ByteArrayOutputStream(0);
 
     private boolean finished;
 
@@ -49,16 +49,18 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
 
     @Override
     public void write(int b) throws IOException {
-        if (finished)
+        if (finished) {
             throw new IOException("write beyond end of stream");
+        }
 
         dataBuffer.write(b);
     }
 
     @Override
     public void finish() throws IOException {
-        if (finished)
+        if (finished) {
             return;
+        }
 
         finished = true;
 
@@ -72,10 +74,10 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
     }
 
     private static class RSAOutputStream extends FinishableOutputStream {
-        private Cipher cipher;
+        private final Cipher cipher;
 
-        private ByteBuffer dataBuffer = ByteBuffer.allocate(124);
-        private byte[] block = new byte[128];
+        private final ByteBuffer dataBuffer = ByteBuffer.allocate(124);
+        private final byte[] block = new byte[128];
 
         private boolean finished;
 
@@ -94,8 +96,9 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
 
         @Override
         public void write(int b) throws IOException {
-            if (finished)
+            if (finished) {
                 throw new IOException("write beyond end of stream");
+            }
 
             dataBuffer.put((byte) b);
 
@@ -108,8 +111,9 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
 
         @Override
         public void finish() throws IOException {
-            if (finished)
+            if (finished) {
                 return;
+            }
 
             finished = true;
             writeData();
@@ -118,8 +122,9 @@ public final class L2Ver41xOutputStream extends FinishableOutputStream implement
 
         private void writeData() throws IOException {
             int size = dataBuffer.position();
-            if (size == 0)
+            if (size == 0) {
                 return;
+            }
 
             Arrays.fill(block, (byte) 0);
             block[3] = (byte) (size & 0xff);

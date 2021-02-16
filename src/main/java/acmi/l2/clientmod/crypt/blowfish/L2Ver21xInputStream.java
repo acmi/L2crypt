@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,11 +31,11 @@ import java.security.GeneralSecurityException;
 import java.util.Objects;
 
 public final class L2Ver21xInputStream extends InputStream implements L2Ver21x {
-    private DataInputStream in;
-    private BlowfishEngine blowfish = new BlowfishEngine();
+    private final DataInputStream in;
+    private final BlowfishEngine blowfish = new BlowfishEngine();
 
-    private byte[] readBuffer = new byte[8];
-    private ByteBuffer dataBuffer = ByteBuffer.allocate(8);
+    private final byte[] readBuffer = new byte[8];
+    private final ByteBuffer dataBuffer = ByteBuffer.allocate(8);
 
     {
         dataBuffer.position(dataBuffer.limit());
@@ -61,7 +61,7 @@ public final class L2Ver21xInputStream extends InputStream implements L2Ver21x {
     }
 
     @Override
-    public int available() throws IOException {
+    public int available() {
         return dataBuffer.limit() - dataBuffer.position();
     }
 

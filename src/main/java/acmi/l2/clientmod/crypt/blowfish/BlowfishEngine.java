@@ -3,7 +3,7 @@
  * the BouncyCastle JCE
  *
  * Copyright (c) 2000 The Legion Of The Bouncy Castle (http://www.bouncycastle.org)
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,

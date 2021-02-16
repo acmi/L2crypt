@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,8 +46,9 @@ public final class L2Ver120InputStream extends FilterInputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int r = in.read(b, off, len);
-        for (int i = 0; i < r; i++)
+        for (int i = 0; i < r; i++) {
             b[off + i] ^= getXORKey(ind++);
+        }
         return r;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import java.io.InputStream;
 import java.util.Objects;
 
 public final class L2Ver1x1InputStream extends FilterInputStream {
-    private int xorKey;
+    private final int xorKey;
 
     public L2Ver1x1InputStream(InputStream input, int xorKey) {
         super(Objects.requireNonNull(input, "stream"));
@@ -43,8 +43,9 @@ public final class L2Ver1x1InputStream extends FilterInputStream {
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int r = in.read(b, off, len);
-        for (int i = 0; i < r; i++)
+        for (int i = 0; i < r; i++) {
             b[off + i] ^= xorKey;
+        }
         return r;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,18 +33,18 @@ import acmi.l2.clientmod.crypt.xor.L2Ver1x1OutputStream;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.Charset;
 
 import static acmi.l2.clientmod.crypt.blowfish.L2Ver21x.BLOWFISH_KEY_211;
 import static acmi.l2.clientmod.crypt.blowfish.L2Ver21x.BLOWFISH_KEY_212;
 import static acmi.l2.clientmod.crypt.rsa.L2Ver41x.*;
 import static acmi.l2.clientmod.crypt.xor.L2Ver1x1.XOR_KEY_111;
 import static acmi.l2.clientmod.crypt.xor.L2Ver1x1.getXORKey121;
+import static java.nio.charset.StandardCharsets.UTF_16LE;
 
 public class L2Crypt {
     public static final int NO_CRYPT = -1;
 
-    private static final BigInteger RSA_KEYS[][] = new BigInteger[][]{
+    private static final BigInteger[][] RSA_KEYS = new BigInteger[][]{
             {MODULUS_411, PRIVATE_EXPONENT_411},
             {MODULUS_412, PRIVATE_EXPONENT_412},
             {MODULUS_413, PRIVATE_EXPONENT_413},
@@ -68,15 +68,16 @@ public class L2Crypt {
     public static int readHeader(InputStream input) throws IOException {
         byte[] header = new byte[HEADER_SIZE];
         new DataInputStream(input).readFully(header);
-        String headerStr = new String(header, Charset.forName("utf-16le"));
-        if (!headerStr.matches("Lineage2Ver\\d{3}"))
+        String headerStr = new String(header, UTF_16LE);
+        if (!headerStr.matches("Lineage2Ver\\d{3}")) {
             return NO_CRYPT;
+        }
 
-        return Integer.valueOf(headerStr.substring(11));
+        return Integer.parseInt(headerStr.substring(11));
     }
 
     public static void writeHeader(OutputStream output, int version) throws IOException {
-        output.write(("Lineage2Ver" + version).getBytes(Charset.forName("UTF-16LE")));
+        output.write(("Lineage2Ver" + version).getBytes(UTF_16LE));
     }
 
     public static InputStream getInputStream(File file) throws IOException, CryptoException {
@@ -136,8 +137,9 @@ public class L2Crypt {
     }
 
     public static OutputStream encrypt(OutputStream output, String fileName, int version) throws IOException, CryptoException {
-        if (version == NO_CRYPT)
+        if (version == NO_CRYPT) {
             return output;
+        }
 
         writeHeader(output, version);
         switch (version) {

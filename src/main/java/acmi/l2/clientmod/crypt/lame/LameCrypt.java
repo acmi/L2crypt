@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,13 +38,15 @@ public class LameCrypt {
             public int read() throws IOException {
                 int b = input.read();
 
-                if (b == -1)
+                if (b == -1) {
                     return -1;
+                }
 
                 b ^= cryptString.charAt(pos++);
 
-                if (pos == cryptString.length())
+                if (pos == cryptString.length()) {
                     pos = 0;
+                }
 
                 return b;
             }
@@ -59,8 +61,9 @@ public class LameCrypt {
             public void write(int b) throws IOException {
                 b ^= cryptString.charAt(pos++);
 
-                if (pos == cryptString.length())
+                if (pos == cryptString.length()) {
                     pos = 0;
+                }
 
                 output.write(b);
             }

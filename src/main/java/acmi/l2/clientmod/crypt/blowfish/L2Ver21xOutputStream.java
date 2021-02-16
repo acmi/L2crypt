@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,10 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public final class L2Ver21xOutputStream extends FinishableOutputStream implements L2Ver21x {
-    private BlowfishEngine blowfish = new BlowfishEngine();
+    private final BlowfishEngine blowfish = new BlowfishEngine();
 
-    private byte[] writeBuffer = new byte[8];
-    private ByteBuffer dataBuffer = ByteBuffer.allocate(8);
+    private final byte[] writeBuffer = new byte[8];
+    private final ByteBuffer dataBuffer = ByteBuffer.allocate(8);
 
     private boolean finished;
 

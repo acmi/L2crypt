@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 acmi
+ * Copyright (c) 2021 acmi
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ import java.io.OutputStream;
 import java.util.Objects;
 
 public final class L2Ver1x1OutputStream extends FilterOutputStream {
-    private int xorKey;
+    private final int xorKey;
 
     public L2Ver1x1OutputStream(OutputStream output, int xorKey) {
         super(Objects.requireNonNull(output, "stream"));
